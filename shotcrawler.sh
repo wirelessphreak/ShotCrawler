@@ -9,11 +9,12 @@
 
 # change these to your likings
 chromebin=/usr/bin/google-chrome
-chromeflags="--headless --disable-gpu --window-size=1920,2080"
 savedir=pics/$(date +%m-%d-%y)/
 fileviewer=xdg-open
 default=https://
 timeout=15s
+useragent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"
+chromeflags='--headless --disable-gpu --window-size=1920,2080 --user-agent=''"'"${useragent}"'"'
 
 # retrieve snapshot
 getSnap() {
@@ -23,7 +24,7 @@ getSnap() {
     url=${default}${1}
   fi
   savename="$savedir/$(nameClean ${url}).png"
-  timeout $timeout $chromebin $chromeflags --screenshot="$savename"  "$url"
+  eval timeout $timeout $chromebin $chromeflags --screenshot="$savename" "$url"
 }
 
 # view saved snapshots
