@@ -18,6 +18,7 @@ chromeflags='--headless --disable-gpu --window-size=1920,2080 --user-agent=''"'"
 
 # retrieve snapshot
 getSnap() {
+  mkdir -p "$savedir" 2> /dev/null
   url="$1"
   # fix url if http or https is not provided
   if ! grep -q -E -o 'http?' <<< "$1"; then
@@ -37,18 +38,21 @@ nameClean() {
   awk -F'/' '{print $3}' <<< "$1"
 }
 
+usage() {
+  echo "Usage for $0"
+  echo ""
+  echo " -u [url]"
+  echo "    must include http:// or https://"
+  echo ""
+  echo " -f [file]"
+  echo "    flat file with urls on new line"
+  echo ""
+}
+
 # main is a mess, will replace "if" statements with case.
 main() {
-  mkdir -p "$savedir" 2> /dev/null
   if [[ $1 == "" ]] || [[ $2 == "" ]]; then
-    echo "Usage for $0"
-    echo ""
-    echo " -u [url]"
-    echo "    must include http:// or https://"
-    echo ""
-    echo " -f [file]"
-    echo "    flat file with urls"
-    echo ""
+    usage $0
   elif [[ $1 == "-u" ]]; then
     getSnap "$2"
     viewSnap
