@@ -1,2 +1,2 @@
 # ShotCrawler
-Script to automate screen captures 
+Script to automate website screen captures
