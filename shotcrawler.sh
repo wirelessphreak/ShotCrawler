@@ -21,16 +21,16 @@ getSnap() {
   mkdir -p "$savedir" 2> /dev/null
   url="$1"
   # fix url if http or https is not provided
-  if ! grep -q -E -o 'http?' <<< "$1"; then
+  if ! grep -q -E -o '^http?' <<< "$1"; then
     url=${default}${1}
   fi
-  savename="$savedir/$(nameClean ${url}).png"
-  eval timeout $timeout $chromebin $chromeflags --screenshot="$savename" "$url"
+  savename="$savedir/$(nameClean "${url}").png"
+  eval timeout $timeout $chromebin "$chromeflags" --screenshot="$savename" "$url"
 }
 
 # view saved snapshots
 viewSnap() {
-  $fileviewer $savename
+  $fileviewer "$savename"
 }
 
 # remove http?:// from filename
@@ -52,18 +52,18 @@ usage() {
 # main is a mess, will replace "if" statements with case.
 main() {
   if [[ $1 == "" ]] || [[ $2 == "" ]]; then
-    usage $0
+    usage "$0"
   elif [[ $1 == "-u" ]]; then
     getSnap "$2"
     viewSnap
   elif [[ $1 == "-f" ]]; then
-    for i in $(cat $2 | awk '{print $1}'); do
-      echo ShotCrawling "$i"
-      getSnap "${i}"
+    awk '{print $1}' "$2" | while IFS= read -r line; do
+      echo ShotCrawling "$line"
+      getSnap "${line}"
       viewSnap
     done
   fi
 }
 
 # do it yo
-main $1 $2
+main "$1" "$2"
