@@ -39,14 +39,15 @@ nameClean() {
 }
 
 usage() {
-  echo "Usage for $0"
-  echo ""
-  echo " -u [url]"
-  echo "    must include http:// or https://"
-  echo ""
-  echo " -f [file]"
-  echo "    flat file with urls on new line"
-  echo ""
+  cat <<EOF
+Usage for $0
+
+   -u [url]
+      must include http:// or https://
+
+   -f [file]
+      flat file with urls on new line"
+EOF
 }
 
 # main is a mess, will replace "if" statements with case.
