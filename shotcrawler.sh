@@ -10,11 +10,13 @@
 # change these to your likings
 chromebin=/usr/bin/google-chrome
 savedir=pics/$(date +%m-%d-%y)/
+# if you dont want to view the files replace viewer with :
 fileviewer=xdg-open
 default=https://
 timeout=15s
 useragent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36"
 chromeflags='--headless --disable-gpu --window-size=1920,2080 --user-agent=''"'"${useragent}"'"'
+errorlog=error.log
 
 # retrieve snapshot
 getSnap() {
@@ -25,7 +27,16 @@ getSnap() {
     url=${default}${1}
   fi
   savename="$savedir/$(nameClean "${url}").png"
-  eval timeout $timeout $chromebin "$chromeflags" --screenshot="$savename" "$url"
+  echo "### $(nameClean "${url}") $(date) ###" >> "$errorlog"
+  eval timeout $timeout $chromebin "$chromeflags" --screenshot="$savename" "$url" 2>> "$errorlog"
+}
+
+listSnap() {
+  awk '{print $1}' "$1" | while IFS= read -r line; do
+    echo ShotCrawling "$line"
+    getSnap "${line}"
+    viewSnap
+  done
 }
 
 # view saved snapshots
@@ -33,7 +44,7 @@ viewSnap() {
   $fileviewer "$savename"
 }
 
-# remove http?:// from filename
+# remove http?:// from filenamed
 nameClean() {
   awk -F'/' '{print $3}' <<< "$1"
 }
@@ -46,24 +57,18 @@ Usage for $0
       must include http:// or https://
 
    -f [file]
-      flat file with urls on new line"
+      flat file with urls on new line
 EOF
 }
 
-# main is a mess, will replace "if" statements with case.
 main() {
-  if [[ $1 == "" ]] || [[ $2 == "" ]]; then
-    usage "$0"
-  elif [[ $1 == "-u" ]]; then
-    getSnap "$2"
-    viewSnap
-  elif [[ $1 == "-f" ]]; then
-    awk '{print $1}' "$2" | while IFS= read -r line; do
-      echo ShotCrawling "$line"
-      getSnap "${line}"
-      viewSnap
-    done
-  fi
+  case $1 in
+    '-u' ) echo ShotCrawling "$2"
+           getSnap "$2"
+           viewSnap;;
+    '-f' ) listSnap "$2";;
+        *) usage;;
+  esac
 }
 
 # do it yo
